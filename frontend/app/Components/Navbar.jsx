@@ -19,10 +19,10 @@ export default function Navbar({ user }) {
           <span className="w-2 h-2 bg-green-400 rounded-full group-hover:bg-green-600 transition"></span>
         </Link>
         <Link
-          href="/features"
+          href="/organization"
           className="text-gray-500 hover:text-indigo-600 font-medium transition-colors duration-200 px-2 py-1 rounded hover:bg-indigo-50"
         >
-          Features
+          Organization
         </Link>
         <Link
           href="/trackers"

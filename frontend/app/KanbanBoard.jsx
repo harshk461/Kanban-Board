@@ -157,32 +157,61 @@ export default function KanbanBoard() {
       collisionDetection={closestCorners}
       onDragEnd={handleDragEnd}
     >
-      <div className="grid grid-cols-4 gap-4 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-gradient-to-br from-indigo-50 to-green-50 min-h-screen">
         {columns.map((column) => {
           const tasksInColumn = getTasksByColumn(column);
           return (
-            <div key={column} className="bg-gray-100 rounded-xl p-4 shadow-md flex flex-col">
-              <h2 className="text-xl font-bold capitalize mb-2">{column.replace('_', ' ')}</h2>
-  
+            <div 
+              key={column} 
+              className="bg-white/80 backdrop-blur-lg border border-indigo-100 rounded-2xl shadow-lg p-4 flex flex-col gap-2 transition-all hover:shadow-xl"
+            >
+              <div className="flex items-center justify-between mb-2 px-2">
+                <h2 className="text-lg font-bold text-indigo-700 capitalize flex items-center gap-2">
+                  <span className={`w-3 h-3 rounded-full ${
+                    column === 'todo' ? 'bg-indigo-400' :
+                    column === 'in_progress' ? 'bg-yellow-400' : 'bg-green-400'
+                  }`}></span>
+                  {column.replace('_', ' ')}
+                </h2>
+                <span className="text-sm text-indigo-500 bg-indigo-50 px-2 py-1 rounded-full">
+                  {tasksInColumn.length}
+                </span>
+              </div>
+
               <SortableContext
                 items={tasksInColumn.map((t) => t.id.toString())}
                 strategy={verticalListSortingStrategy}
               >
-                {tasksInColumn.map((task) => (
-                  <SortableItem
-                    key={task.id}
-                    id={task.id.toString()}
-                    task={task}
-                    column={column}
-                  />
-                ))}
+                <div className="flex flex-col gap-2 flex-1">
+                  {tasksInColumn.map((task) => (
+                    <SortableItem
+                      key={task.id}
+                      id={task.id.toString()}
+                      task={task}
+                      column={column}
+                    />
+                  ))}
+                </div>
               </SortableContext>
-  
+
               <button
                 onClick={() => addTask(column)}
-                className="mt-auto py-2 px-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                className="mt-4 w-full py-2 px-4 bg-indigo-100 text-indigo-600 rounded-xl hover:bg-indigo-200 transition-colors flex items-center justify-center gap-2"
               >
-                + Add Task
+                <svg 
+                  className="w-5 h-5" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" 
+                  />
+                </svg>
+                Add Task
               </button>
             </div>
           );

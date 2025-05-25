@@ -2,15 +2,17 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import axiosClient from "@/app/common/axiosConfig";
+import toast from "react-hot-toast";
 
 export default function Signup() {
   const [avatar, setAvatar] = useState(null);
   const [preview, setPreview] = useState(null);
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    password: "",
+    name: "Harsh 2",
+    email: "test2@gmail.com ",
+    phone: "1234567890",
+    password: "1234567",
   });
   const [loading, setLoading] = useState(false);
 
@@ -26,11 +28,21 @@ export default function Signup() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    setLoading(true);
-    // TODO: Integrate with your signup logic
-    setTimeout(() => setLoading(false), 1200);
+    try{
+      setLoading(true);
+      const response = await axiosClient.post("/auth/signup",{...form});
+
+      toast.success("Sucess");
+      window.location.href="/";
+    }
+    catch(err){
+      toast.error(err?.response?.data?.message || "Server Error");
+    }
+    finally{
+      setLoading(false);
+    }
   };
 
   return (

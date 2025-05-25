@@ -3,17 +3,29 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { FaGoogle } from "react-icons/fa";
+import toast from "react-hot-toast";
+import axiosClient from "@/app/common/axiosConfig";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async(e) => {
     e.preventDefault();
-    setLoading(true);
-    // TODO: Integrate with your authentication logic
-    setTimeout(() => setLoading(false), 1200);
+    try {
+      setLoading(true);
+      const response = await axiosClient.post("/auth/login",{email,password});
+      localStorage.setItem("token",response.data.token);
+      toast.success("Logged In Successfully");
+      window.location.href="/";
+
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Server Error");
+      throw error;
+    }finally{
+      setLoading(false);
+    }
   };
 
   return (

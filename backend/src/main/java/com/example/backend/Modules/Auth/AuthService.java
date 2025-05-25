@@ -18,7 +18,7 @@ public class AuthService {
     }
 
     public String login(String email, String password) {
-        AppUser user = appUserRepository.findByEmail(email);
+        AppUser user = appUserRepository.findUserByEmail(email);
         if (user == null) {
             throw new RuntimeException("User not found");
         }

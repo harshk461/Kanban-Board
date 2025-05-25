@@ -2,6 +2,8 @@ package com.example.backend.Common.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -16,6 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE #{#entityName} SET deleted_at = now() WHERE id = ?")
 @Where(clause = "deleted_at IS NULL")
+@SuperBuilder(toBuilder = true)
 public abstract class BaseEntity {
 
     @Id

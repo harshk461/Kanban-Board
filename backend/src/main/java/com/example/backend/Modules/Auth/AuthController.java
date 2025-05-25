@@ -1,5 +1,8 @@
 package com.example.backend.Modules.Auth;
 
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +21,13 @@ public class AuthController {
         try {
             authService.signup(signupRequest.name, signupRequest.email, signupRequest.phone, signupRequest.profile,
                     signupRequest.password);
-            return ResponseEntity.ok("User registered successfully");
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(Map.of("message", "success", "status", HttpStatus.OK));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage(), "status", HttpStatus.BAD_REQUEST));
         }
     }
 
@@ -30,7 +37,9 @@ public class AuthController {
             String token = authService.login(loginRequest.email, loginRequest.password);
             return ResponseEntity.ok(new JwtResponse(token));
         } catch (Exception e) {
-            return ResponseEntity.status(401).body("Invalid credentials");
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid credentials", "status", 401));
         }
     }
 
