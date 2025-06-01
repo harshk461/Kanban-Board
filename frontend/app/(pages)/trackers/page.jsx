@@ -13,7 +13,7 @@ export default function TrackersPage() {
   const [token, setToken] = useState(null);
 
     // Add at the top of your component:
-    const [columns, setColumns] = useState(["To Do", "In Progress", "Done"]); // Default columns
+    const [columns, setColumns] = useState(["To Do", "In Progress", "Done"]);
 
     const handleAddColumn = () => setColumns([...columns, ""]);
     const handleRemoveColumn = (idx) => setColumns(columns.filter((_, i) => i !== idx));
@@ -33,10 +33,13 @@ export default function TrackersPage() {
         }
         setLoading(true);
         try {
-            const response = await axiosClient.post('/tracker', {
-            name: newTrackerName,
-            description: newTrackerDesc,
-            columns, // Pass columns to backend
+            const lowerCaseColumns = columns.map((item) =>
+              item.toLowerCase().replace(/\s+/g, '_')
+            );          
+            const response = await axiosClient.post('/tracker/add-tracker?orgId=', {
+              name: newTrackerName,
+              description: newTrackerDesc,
+              columns:lowerCaseColumns,
             });
             setTrackers((prev) => [...prev, response.data]);
             setNewTrackerName('');

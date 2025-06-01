@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Kanban Board API
-  description: API documentation for the Organization-level Kanban app with user, organization, and tracker management.
+  title: Kanban Pro Auth API
   version: 1.0.0
+  description: API documentation for the Organization-level Kanban app with user, organization, and tracker management.
 
 servers:
   - url: http://localhost:8080/api
@@ -16,6 +16,67 @@ components:
       bearerFormat: JWT
 
   schemas:
+    SignupRequest:
+      type: object
+      required: [name, email, phone, password, profile]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        password:
+          type: string
+        profile:
+          type: string
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    JwtResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6...
+
+    ProfileDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        profile:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateOrganizationRequest:
+      type: object
+      required: [name, description]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
     OrganizationDTO:
       type: object
       properties:
@@ -26,94 +87,238 @@ components:
           type: string
         description:
           type: string
-        isCreatedBy:
-          type: boolean
+        createdAt:
+          type: string
+          format: date-time
 
-    CreateOrganizationRequest:
+    OrganizationListResponse:
       type: object
-      required:
-        - name
-        - description
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Organizations fetched successfully
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationDTO'
+
+    OrganizationResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/OrganizationDTO'
+
+    GenericSuccess:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: success
+        data:
+          nullable: true
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        data:
+          nullable: true
+
+    AddTaskDTO:
+      type: object
+      required: [name, description, status, position]
       properties:
         name:
           type: string
         description:
           type: string
-
-    UserLoginRequest:
-      type: object
-      required:
-        - email
-        - password
-      properties:
-        email:
+        status:
           type: string
-        password:
-          type: string
+        position:
+          type: integer
 
-    TokenResponse:
+    AppTaskDTO:
       type: object
       properties:
-        token:
+        id:
           type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        position:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+          format: uuid
 
-security:
-  - bearerAuth: []
+    AddNewTrackerBody:
+      type: object
+      required: [name, description, columns]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        columns:
+          type: array
+          items:
+            type: string
+
+    AppTrackerDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        columns:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+          format: uuid
+
+    AppTrackerToOrgDTO:
+      type: object
+      properties:
+        orgId:
+          type: string
+          format: uuid
+        trackerId:
+          type: string
+          format: uuid
+        id:
+          type: string
+          format: uuid
 
 paths:
+  /auth/signup:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '200':
+          description: Signup successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericSuccess'
+        '400':
+          description: Signup failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /auth/login:
     post:
-      summary: User login
+      summary: Authenticate user and return JWT
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserLoginRequest'
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: JWT Token returned
+          description: Login successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenResponse'
+                $ref: '#/components/schemas/JwtResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
-  /organizations:
+  /auth/profile:
     get:
-      summary: Get all organizations for the logged-in user
+      summary: Get user profile by email
+      parameters:
+        - in: query
+          name: email
+          required: true
+          schema:
+            type: string
+            format: email
       responses:
         '200':
-          description: List of organizations
+          description: Profile returned successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OrganizationDTO'
+                $ref: '#/components/schemas/ProfileDTO'
+        '400':
+          description: Invalid email or missing parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /organization/user:
+    get:
+      summary: Get organizations for current user
       security:
         - bearerAuth: []
-
-    post:
-      summary: Create a new organization
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrganizationRequest'
       responses:
-        '201':
-          description: Organization created
+        '200':
+          description: Organizations fetched
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrganizationDTO'
+                $ref: '#/components/schemas/OrganizationListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /organization/{orgId}/add-user:
+    post:
+      summary: Add current user to an organization by ID
       security:
         - bearerAuth: []
-
-  /organizations/{orgId}/add-user/{userId}:
-    post:
-      summary: Add a user to an organization
       parameters:
         - name: orgId
           in: path
@@ -121,7 +326,56 @@ paths:
           schema:
             type: string
             format: uuid
-        - name: userId
+      responses:
+        '200':
+          description: User added to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericSuccess'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /organization:
+    post:
+      summary: Create a new organization
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganizationRequest'
+      responses:
+        '200':
+          description: Organization created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /tasks/{trackerId}:
+    get:
+      summary: Get all tasks for a tracker
+      parameters:
+        - name: trackerId
           in: path
           required: true
           schema:
@@ -129,8 +383,172 @@ paths:
             format: uuid
       responses:
         '200':
-          description: User added
-        '400':
-          description: Invalid operation
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppTaskDTO'
+
+  /tasks/add-task/{trackerId}:
+    post:
+      summary: Create a new task in a tracker
       security:
         - bearerAuth: []
+      parameters:
+        - name: trackerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTaskDTO'
+      responses:
+        '200':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppTaskDTO'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /tasks/{id}:
+    put:
+      summary: Update a task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppTaskDTO'
+      responses:
+        '200':
+          description: Updated task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppTaskDTO'
+    delete:
+      summary: Delete a task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Task deleted
+
+  /tracker/{trackerId}:
+    get:
+      summary: Get a tracker by its ID
+      parameters:
+        - name: trackerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Tracker details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppTrackerDTO'
+
+  /tracker/org-trackers:
+    get:
+      summary: Get all trackers for an organization
+      parameters:
+        - name: orgId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of trackers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppTrackerDTO'
+
+  /tracker/add-tracker:
+    post:
+      summary: Add a new tracker to an organization
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddNewTrackerBody'
+      responses:
+        '200':
+          description: Tracker created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppTrackerDTO'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /tracker/{orgId}/add-tracker-to-org/{trackerId}:
+    post:
+      summary: Link an existing tracker to an organization
+      parameters:
+        - name: orgId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: trackerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Tracker linked to org
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppTrackerToOrgDTO'

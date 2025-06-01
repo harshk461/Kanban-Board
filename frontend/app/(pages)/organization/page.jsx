@@ -172,12 +172,16 @@ export default function OrganizationsPage() {
                     className="flex items-center gap-4 bg-indigo-50/60 border border-indigo-100 rounded-2xl p-5 shadow hover:shadow-lg transition"
                 >
                     <img
-                    src={org.avataar}
-                    alt={org.name}
-                    className="w-14 h-14 rounded-full border-2 border-indigo-300 object-cover"
+                      src={org.avataar}
+                      alt={org.name}
+                      className="w-14 h-14 rounded-full border-2 border-indigo-300 object-cover"
                     />
                     <div className="flex-1">
-                    <div className="text-lg font-bold text-indigo-700">{org.name}</div>
+                    <div className="text-lg font-bold text-indigo-700">
+                      <Link href={`/organization/${org.id}`}>
+                        {org.name}
+                      </Link>
+                    </div>
                     <div className="text-gray-600">{org.description}</div>
                     </div>
                     {org.createdBy && <ShareButton

@@ -3,6 +3,7 @@ package com.example.backend.Modules.Orgnisation;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,9 @@ public class OrganizationController {
 
     private final OrginsationService organizationService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     // Get all organizations for a user
     @GetMapping("/user")
     public ResponseEntity<Response<List<OrganizationDTO>>> getUserOrganizations(HttpServletRequest request) {
@@ -40,7 +44,7 @@ public class OrganizationController {
             HttpServletRequest request) {
         try {
             String token = request.getHeader("Authorization").substring(7); // Remove "Bearer "
-            String email = JwtUtil.extractEmail(token);
+            String email = jwtUtil.extractEmail(token);
             UUID userId = organizationService.getUserIdByEmail(email);
 
             organizationService.addUserToOrganization(userId, orgId);
@@ -78,7 +82,7 @@ public class OrganizationController {
 
     public UUID getUserIdFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7); // Remove "Bearer "
-        String email = JwtUtil.extractEmail(token);
+        String email = jwtUtil.extractEmail(token);
         UUID userId = organizationService.getUserIdByEmail(email);
 
         return userId;

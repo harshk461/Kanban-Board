@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.backend.Modules.Auth.DTO.ProfileDTO;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -43,6 +45,11 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/profile")
+    public ProfileDTO getProfile(@RequestParam String email) {
+        return this.authService.getProfile(email);
+    }
+
     // DTO classes for request and response (could be separate files)
 
     public static record SignupRequest(String name, String email, String phone, String password, String profile) {
@@ -53,4 +60,5 @@ public class AuthController {
 
     public static record JwtResponse(String token) {
     }
+
 }

@@ -12,11 +12,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Task extends BaseEntity {
+public class AppTask extends BaseEntity {
 
     private String title;
     private String description;
-    private String status; // e.g., todo, in_progress, done
+    private String status;
     private Integer position;
 
     @ManyToOne

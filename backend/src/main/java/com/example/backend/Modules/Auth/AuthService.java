@@ -1,9 +1,11 @@
 package com.example.backend.Modules.Auth;
 
 import com.example.backend.Common.JwtUtil;
+import com.example.backend.Modules.Auth.DTO.ProfileDTO;
 import com.example.backend.Modules.Auth.Entity.AppUser;
 import com.example.backend.Modules.Auth.Repository.AppUserRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,9 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final AppUserRepository appUserRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     public AuthService(AppUserRepository appUserRepository) {
         this.appUserRepository = appUserRepository;
@@ -28,7 +33,7 @@ public class AuthService {
         }
 
         // Generate JWT token
-        return JwtUtil.generateToken(user.getId().toString(), user.getEmail());
+        return jwtUtil.generateToken(user.getId().toString(), user.getEmail());
     }
 
     public AppUser signup(String name, String email, String phone, String profile, String password) {
@@ -47,5 +52,19 @@ public class AuthService {
                 .build();
 
         return appUserRepository.save(user);
+    }
+
+    public ProfileDTO getProfile(String email) {
+        AppUser user = appUserRepository.findUserByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        return ProfileDTO.builder()
+                .name(user.getName())
+                .email(user.getEmail())
+                .profile(user.getProfileImage())
+                .phone(user.getPhone())
+                .build();
     }
 }

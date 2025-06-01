@@ -1,17 +1,15 @@
 package com.example.backend.Modules.Tasks;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.example.backend.Modules.Tasks.Entity.Task;
+import com.example.backend.Common.JwtUtil;
+import com.example.backend.Modules.Tasks.DTO.AppTaskDTO;
+import com.example.backend.Modules.Tasks.Entity.AppTask;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -20,24 +18,31 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin
 public class TaskController {
     private final TaskService taskService;
+    private final JwtUtil jwtUtil;
 
-    @GetMapping
-    public List<Task> getAllTasks() {
-        return taskService.getAllTasks();
+    @GetMapping("/{trackerId}")
+    public List<AppTaskDTO> getAllTasks(@PathVariable UUID trackerId) {
+        return taskService.getAllTasks(trackerId);
     }
 
-    @PostMapping
-    public Task createTask(@RequestBody Task task) {
-        return taskService.createTask(task);
+    @PostMapping("/add-task/{trackerId}")
+    public AppTaskDTO createTask(@PathVariable UUID trackerId, @RequestBody AddTaskDTO task,
+            HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        UUID userId = jwtUtil.extractUserId(token);
+        return taskService.createTask(task.name, task.description, task.status, task.position, trackerId, userId);
     }
 
     @PutMapping("/{id}")
-    public Task updateTask(@PathVariable UUID id, @RequestBody Task task) {
+    public AppTaskDTO updateTask(@PathVariable UUID id, @RequestBody AppTaskDTO task) {
         return taskService.updateTask(id, task);
     }
 
     @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable UUID id) {
         taskService.deleteTask(id);
+    }
+
+    public static record AddTaskDTO(String name, String description, String status, Integer position) {
     }
 }

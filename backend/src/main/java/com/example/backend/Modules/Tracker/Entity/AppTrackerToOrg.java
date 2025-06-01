@@ -20,4 +20,6 @@ public class AppTrackerToOrg extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "tracker_id")
     private AppTracker tracker;
+
+    private Boolean isActive;
 }
