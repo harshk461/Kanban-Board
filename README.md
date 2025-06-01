@@ -21,24 +21,6 @@ Kanban Pro helps teams organize tasks, track progress, and collaborate efficient
 
 ---
 
-## 🏗️ Project Structure
-
-kanban-pro/
-├── backend/ # Java Spring Boot REST API
-│ ├── src/
-│ ├── pom.xml
-│ └── ...
-├── frontend/ # Next.js + Tailwind CSS app
-│ ├── app/
-│ ├── components/
-│ ├── tailwind.config.js
-│ ├── package.json
-│ └── ...
-└── README.md
-
-
----
-
 ## ⚙️ Tech Stack
 
 | Layer      | Technology                |
@@ -56,6 +38,7 @@ kanban-pro/
 ### 1. Clone the Repository
 
 git clone https://github.com/harshk461/Kanban-Board.git
+
 cd Kanban-Board
 
 
@@ -178,14 +161,14 @@ See [API Docs](http://localhost:3000/api-docs) for full endpoints.
 
 ## ✨ Screenshots
 
-![Home](./images/home.png)
-![Login](./images/login.png)
-![org](./images/org.png)
-![tracker](./images/tracker.png)
+![Home](./Images/home.png)
+![Login](./Images/login.png)
+![org](./Images/org.png)
+![tracker](./Images/tracker.png)
 ![board](./Images/board.png)
-![pricing](./images/pricing.png)
-![updates](./images/updates.png)
-![api docs](./images/api-docs.png)
+![pricing](./Images/pricing.png)
+![updates](./Images/updates.png)
+![api docs](./Images/api-docs.png)
 
 ---
 
